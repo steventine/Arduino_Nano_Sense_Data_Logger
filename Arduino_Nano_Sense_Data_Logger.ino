@@ -104,7 +104,7 @@ void setup() {
     showState(ERR);  //Set RED to show error
     while (1);
   }
-  myFile.println("Ms,AccelX,AccelY,AccelZ,Temp");
+  myFile.println("Ms,DeltaMs,AccelX,AccelY,AccelZ,Temp");
   
   showState(NONE);
   
@@ -190,6 +190,7 @@ void loop() {
   }
 
   showState(WRITING);
+  myFile.print(now); myFile.print(",");
   myFile.print(delta_time); myFile.print(",");
   myFile.print(a.acceleration.x); myFile.print(",");
   myFile.print(a.acceleration.y); myFile.print(",");
