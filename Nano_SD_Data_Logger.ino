@@ -7,14 +7,15 @@
 
 #define SEC_PER_FLUSH 2   //Flushing data to SD card takes time...do it after this many seconds
 #define SEC_PER_TEMP 5    //Temperature doesn't change that often...log it after this many seconds
-#define FILE_NAME "test.csv"
 
-//Nano Color LEDs
+#define FILE_NAME_PRE "data"
+#define FILE_NAME_EXT ".csv"
+
+//LED Colors
 #define RED 22     
 #define BLUE 24     
 #define GREEN 23
 
-#define SD_CARD_CHIP_SELECT_PIN 10
 enum sd_state{
   NONE,
   ERR,
@@ -31,6 +32,7 @@ Adafruit_LSM9DS1 lsm = Adafruit_LSM9DS1(&Wire1,0);
 #define LSM9DS1_MOSI A4
 #define LSM9DS1_XGCS 6
 #define LSM9DS1_MCS 5
+#define SD_CARD_CHIP_SELECT_PIN 10
 
 void setupSensor()
 {
@@ -93,7 +95,7 @@ void setup() {
     showState(ERR);  //Set RED to show error
     while (1);
   }
-  myFile = SD.open(FILE_NAME, FILE_WRITE);
+  myFile = SD.open(GetNewFileName(), FILE_WRITE);
   // if the file opened okay, write to it:
   if (myFile) {
     Serial.println("File opened");
@@ -110,6 +112,23 @@ void setup() {
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
 }
+
+
+String GetNewFileName(void) {
+  String FileName = "";
+  int t = 1;
+  //find the next available file name on the SD card
+  do {
+    FileName = FILE_NAME_PRE;
+    FileName = FileName + t;
+    FileName = FileName + FILE_NAME_EXT;
+    t++;
+  } while (SD.exists(FileName) == true);
+  Serial.println("using " + FileName);
+  return FileName;
+}
+
+
 
 void showState(sd_state state) {
   switch (state){
@@ -163,7 +182,7 @@ void loop() {
   earlier = now;
 
   if (DEBUG_WITH_SERIAL){
-    Serial.print("Ms: "); Serial.println(delta_time);
+    //Serial.print("Ms: "); Serial.println(delta_time);
     //Serial.print("\tAccel X: "); Serial.print(a.acceleration.x);
     //Serial.print("\tY: "); Serial.print(a.acceleration.y);
     //Serial.print("\tZ: "); Serial.print(a.acceleration.z);
